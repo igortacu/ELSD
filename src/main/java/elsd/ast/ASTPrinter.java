@@ -4,12 +4,7 @@ import elsd.ast.ASTNode.*;
 
 import java.util.List;
 
-/**
- * Pretty-prints the AST as an indented tree.
- *
- * Usage:
- *   String output = new ASTPrinter().print(programNode);
- */
+// renders the AST as an indented text tree; delegates all formatting through the visitor
 public class ASTPrinter implements ASTVisitor<String> {
 
     private int indent = 0;
@@ -18,7 +13,6 @@ public class ASTPrinter implements ASTVisitor<String> {
         return node.accept(this);
     }
 
-    // ─── formatting helpers ─────────────────────────────────────────
     private String pad() {
         return "  ".repeat(indent);
     }
@@ -37,7 +31,6 @@ public class ASTPrinter implements ASTVisitor<String> {
         return sb.toString();
     }
 
-    // ═════════════════════════════════════════════════════════════════
     @Override
     public String visitProgram(Program node) {
         StringBuilder sb = new StringBuilder();
@@ -85,8 +78,6 @@ public class ASTPrinter implements ASTVisitor<String> {
         return line("Dominance [" + node.dominant + " -> " + node.recessive + "]");
     }
 
-    // ─── expressions ────────────────────────────────────────────────
-
     @Override
     public String visitNumberLiteral(NumberLiteral node) {
         return line(node.value);
@@ -124,8 +115,6 @@ public class ASTPrinter implements ASTVisitor<String> {
         return node.event.accept(this);
     }
 
-    // ─── conditions ─────────────────────────────────────────────────
-
     @Override
     public String visitCompareCondition(CompareCondition node) {
         return line("(" + node.left.accept(this).trim()
@@ -144,8 +133,6 @@ public class ASTPrinter implements ASTVisitor<String> {
     public String visitNotCondition(NotCondition node) {
         return line("(not " + node.operand.accept(this).trim() + ")");
     }
-
-    // ─── flow ───────────────────────────────────────────────────────
 
     @Override
     public String visitIfStatement(IfStatement node) {
@@ -198,8 +185,6 @@ public class ASTPrinter implements ASTVisitor<String> {
         sb.append(visitChildren(node.body));
         return sb.toString();
     }
-
-    // ─── computations ───────────────────────────────────────────────
 
     @Override
     public String visitFindExpr(FindExpr node) {
@@ -288,8 +273,6 @@ public class ASTPrinter implements ASTVisitor<String> {
         return sb.toString();
     }
 
-    // ─── events ─────────────────────────────────────────────────────
-
     @Override
     public String visitEvent(Event node) {
         if ("carries".equals(node.kind)) {
@@ -307,8 +290,6 @@ public class ASTPrinter implements ASTVisitor<String> {
                 })
                 .collect(java.util.stream.Collectors.joining(", "));
     }
-
-    // ─── I/O ────────────────────────────────────────────────────────
 
     @Override
     public String visitPrintStatement(PrintStatement node) {

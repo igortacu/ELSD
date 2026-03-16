@@ -17,21 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-/**
- * ELSD – Entry-Level Scientific DSL
- *
- * Main driver that:
- *   1. Reads a .elsd source file
- *   2. Lexes it (token stream)
- *   3. Parses it (parse tree)
- *   4. Prints the token stream and the parse tree (LISP-style)
- *
- * Usage:
- *   java -cp ".:antlr-4.13.2-complete.jar" elsd.Main <file.elsd>
- *   java -cp ".:antlr-4.13.2-complete.jar" elsd.Main --tokens <file.elsd>
- *   java -cp ".:antlr-4.13.2-complete.jar" elsd.Main --ast    <file.elsd>
- *   java -cp ".:antlr-4.13.2-complete.jar" elsd.Main --gui    <file.elsd>
- */
+// ELSD compiler entry point — lex, parse, and optionally render the AST
 public class Main {
 
     public static void main(String[] args) {
@@ -70,6 +56,8 @@ public class Main {
             System.exit(1);
         }
 
+        
+
         Path path = Paths.get(filePath);
         if (!Files.exists(path)) {
             System.err.println("Error: file not found – " + filePath);
@@ -77,10 +65,8 @@ public class Main {
         }
 
         try {
-            // ── 1. Create the character stream ──────────────────────────
             CharStream input = CharStreams.fromPath(path);
 
-            // ── 2. Lex ─────────────────────────────────────────────────
             ELSDLexer lexer = new ELSDLexer(input);
             CommonTokenStream tokens = new CommonTokenStream(lexer);
             tokens.fill();
@@ -89,16 +75,12 @@ public class Main {
                 printTokens(tokens, lexer);
             }
 
-            // ── 3. Parse ───────────────────────────────────────────────
             ELSDParser parser = new ELSDParser(tokens);
-
-            // Attach an error listener that reports problems clearly
             parser.removeErrorListeners();
             parser.addErrorListener(new DiagnosticErrorListener());
 
             ELSDParser.ProgramContext tree = parser.program();
 
-            // ── 4. Results ─────────────────────────────────────────────
             int errorCount = parser.getNumberOfSyntaxErrors();
             System.out.println();
             System.out.println("═══════════════════════════════════════════");
@@ -116,13 +98,11 @@ public class Main {
                 System.out.println("✗ Parse completed with " + errorCount + " syntax error(s).");
             }
 
-            // Print the LISP-style parse tree
             System.out.println();
             System.out.println("── Parse Tree (LISP) ──────────────────────");
             String lispTree = tree.toStringTree(parser);
             System.out.println(prettyPrintTree(lispTree));
 
-            // Build and print the AST
             if (showAst) {
                 System.out.println();
                 System.out.println("── Abstract Syntax Tree ───────────────────");
@@ -132,7 +112,6 @@ public class Main {
                 System.out.println(printer.print(ast));
             }
 
-            // Export AST as DOT graph and render with graphviz
             if (showGraph) {
                 ASTBuilder builder = new ASTBuilder();
                 ASTNode.Program ast = (ASTNode.Program) builder.visit(tree);
@@ -150,7 +129,6 @@ public class Main {
                 p.waitFor();
             }
 
-            // Open graphical AST viewer
             if (showAstGui) {
                 System.out.println("Opening AST graphical viewer...");
                 ASTBuilder builder = new ASTBuilder();
@@ -158,7 +136,6 @@ public class Main {
                 ASTTreeViewer.show(ast);
             }
 
-            // Optionally open the GUI inspector
             if (showGui) {
                 System.out.println();
                 System.out.println("Opening parse-tree GUI...");
@@ -179,7 +156,6 @@ public class Main {
         }
     }
 
-    // ── Helper: print token stream ──────────────────────────────────────
     private static void printTokens(CommonTokenStream tokens, ELSDLexer lexer) {
         System.out.println();
         System.out.println("── Token Stream ───────────────────────────");
@@ -206,7 +182,7 @@ public class Main {
         System.out.println();
     }
 
-    // ── Helper: indent LISP-style tree output ───────────────────────────
+    // reflows the flat LISP string into indented multi-line output
     private static String prettyPrintTree(String lispTree) {
         StringBuilder sb = new StringBuilder();
         int indent = 0;
@@ -242,7 +218,6 @@ public class Main {
         return sb.toString();
     }
 
-    // ── Custom error listener ───────────────────────────────────────────
     private static class DiagnosticErrorListener extends BaseErrorListener {
         @Override
         public void syntaxError(Recognizer<?, ?> recognizer,

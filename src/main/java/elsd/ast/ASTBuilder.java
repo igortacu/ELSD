@@ -10,41 +10,34 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-// converts the ANTLR parse tree (CST) into a clean AST
-// extends the generated base visitor so each labeled alternative gets its own method
+// lowers the ANTLR CST into a typed AST; each grammar alternative maps to one visit method
 public class ASTBuilder extends ELSDParserBaseVisitor<ASTNode> {
 
-    // sets line and column on a node from a token
     private void setLocation(ASTNode node, Token token) {
         node.line = token.getLine();
         node.col  = token.getCharPositionInLine();
     }
 
-    // extracts list of identifier names from idList rule
     private List<String> extractIdList(ELSDParser.IdListContext ctx) {
         return ctx.ID().stream()
                 .map(TerminalNode::getText)
                 .collect(Collectors.toList());
     }
 
-    // extracts list of expressions from exprList rule
     private List<Expression> extractExprList(ELSDParser.ExprListContext ctx) {
         return ctx.expression().stream()
                 .map(e -> (Expression) visit(e))
                 .collect(Collectors.toList());
     }
 
-    // gets field text or null if not present
     private String fieldText(ELSDParser.FieldContext ctx) {
         return ctx == null ? null : ctx.getText();
     }
 
-    // extracts generation number or null
     private Integer extractGenTag(ELSDParser.GenTagContext ctx) {
         return ctx == null ? null : Integer.parseInt(ctx.NUMBER().getText());
     }
 
-    // builds an Event node from an event context
     private Event buildEvent(ELSDParser.EventContext ctx) {
         Event ev = new Event();
         setLocation(ev, ctx.getStart());
@@ -65,14 +58,12 @@ public class ASTBuilder extends ELSDParserBaseVisitor<ASTNode> {
         return ev;
     }
 
-    // builds list of events from eventList context
     private List<Event> buildEventList(ELSDParser.EventListContext ctx) {
         return ctx.event().stream()
                 .map(this::buildEvent)
                 .collect(Collectors.toList());
     }
 
-    // program - the root rule
     @Override
     public ASTNode visitProgram(ELSDParser.ProgramContext ctx) {
         Program prog = new Program();
@@ -83,8 +74,6 @@ public class ASTBuilder extends ELSDParserBaseVisitor<ASTNode> {
         return prog;
     }
 
-    // statement - dispatches to the right sub-rule
-
     @Override
     public ASTNode visitStatement(ELSDParser.StatementContext ctx) {
         if (ctx.declaration()  != null) return visit(ctx.declaration());
@@ -94,10 +83,6 @@ public class ASTBuilder extends ELSDParserBaseVisitor<ASTNode> {
         if (ctx.io()           != null) return visit(ctx.io());
         throw new RuntimeException("Unknown statement at line " + ctx.getStart().getLine());
     }
-
-    // ═════════════════════════════════════════════════════════════════
-    //  R4. declaration
-    // ═════════════════════════════════════════════════════════════════
 
     @Override
     public ASTNode visitDeclaration(ELSDParser.DeclarationContext ctx) {
@@ -111,10 +96,6 @@ public class ASTBuilder extends ELSDParserBaseVisitor<ASTNode> {
         return decl;
     }
 
-    // ═════════════════════════════════════════════════════════════════
-    //  R14. assignments
-    // ═════════════════════════════════════════════════════════════════
-
     @Override
     public ASTNode visitAssignExpr(ELSDParser.AssignExprContext ctx) {
         AssignExpr node = new AssignExpr();
@@ -127,13 +108,12 @@ public class ASTBuilder extends ELSDParserBaseVisitor<ASTNode> {
 
     @Override
     public ASTNode visitAssignComputation(ELSDParser.AssignComputationContext ctx) {
-        // Treat as AssignExpr — the computation result is stored in the id
+        // computation is a statement here, not an expression — value left null intentionally
         AssignExpr node = new AssignExpr();
         setLocation(node, ctx.getStart());
         node.field = fieldText(ctx.field());
         node.id    = ctx.ID().getText();
-        // wrap the computation result; visit returns the computation ASTNode
-        node.value = null;  // computation is a statement, not an expression
+        node.value = null;
         return node;
     }
 
@@ -155,10 +135,6 @@ public class ASTBuilder extends ELSDParserBaseVisitor<ASTNode> {
         node.recessive = ctx.ID(1).getText();
         return node;
     }
-
-    // ═════════════════════════════════════════════════════════════════
-    //  R17. conditions
-    // ═════════════════════════════════════════════════════════════════
 
     @Override
     public ASTNode visitCondCompare(ELSDParser.CondCompareContext ctx) {
@@ -203,10 +179,6 @@ public class ASTBuilder extends ELSDParserBaseVisitor<ASTNode> {
         return visit(ctx.condition());
     }
 
-    // ═════════════════════════════════════════════════════════════════
-    //  R18–R20. expressions
-    // ═════════════════════════════════════════════════════════════════
-
     @Override
     public ASTNode visitExprNumber(ELSDParser.ExprNumberContext ctx) {
         NumberLiteral lit = new NumberLiteral();
@@ -220,7 +192,7 @@ public class ASTBuilder extends ELSDParserBaseVisitor<ASTNode> {
         StringLiteral lit = new StringLiteral();
         setLocation(lit, ctx.getStart());
         String raw = ctx.STRING_LITERAL().getText();
-        lit.value = raw.substring(1, raw.length() - 1); // strip quotes
+        lit.value = raw.substring(1, raw.length() - 1); // strip surrounding quotes
         return lit;
     }
 
@@ -288,7 +260,7 @@ public class ASTBuilder extends ELSDParserBaseVisitor<ASTNode> {
 
     @Override
     public ASTNode visitExprParen(ELSDParser.ExprParenContext ctx) {
-        return visit(ctx.expression());  // unwrap parentheses
+        return visit(ctx.expression());
     }
 
     @Override
@@ -299,16 +271,12 @@ public class ASTBuilder extends ELSDParserBaseVisitor<ASTNode> {
         return expr;
     }
 
-    // ═════════════════════════════════════════════════════════════════
-    //  R16. flow structures
-    // ═════════════════════════════════════════════════════════════════
-
     @Override
     public ASTNode visitIfStatement(ELSDParser.IfStatementContext ctx) {
         IfStatement node = new IfStatement();
         setLocation(node, ctx.getStart());
 
-        // First "if" branch
+        // condIdx tracks which condition context to consume; stmtListIdx tracks body lists
         int condIdx = 0;
         ConditionBlock mainBranch = new ConditionBlock();
         mainBranch.condition = (Condition) visit(ctx.condition(condIdx));
@@ -316,7 +284,6 @@ public class ASTBuilder extends ELSDParserBaseVisitor<ASTNode> {
         node.branches.add(mainBranch);
         condIdx++;
 
-        // "elif" branches
         int stmtListIdx = 1;
         for (int i = 0; i < ctx.ELIF().size(); i++) {
             ConditionBlock elif = new ConditionBlock();
@@ -327,7 +294,6 @@ public class ASTBuilder extends ELSDParserBaseVisitor<ASTNode> {
             stmtListIdx++;
         }
 
-        // "else" branch
         if (ctx.ELSE() != null) {
             node.elseBody = buildStatementList(ctx.statementList(stmtListIdx));
         }
@@ -364,7 +330,6 @@ public class ASTBuilder extends ELSDParserBaseVisitor<ASTNode> {
         return node;
     }
 
-    /** Helper to convert a statementList context into a list of AST nodes. */
     private List<ASTNode> buildStatementList(ELSDParser.StatementListContext ctx) {
         List<ASTNode> stmts = new ArrayList<>();
         for (ELSDParser.StatementContext sc : ctx.statement()) {
@@ -372,10 +337,6 @@ public class ASTBuilder extends ELSDParserBaseVisitor<ASTNode> {
         }
         return stmts;
     }
-
-    // ═════════════════════════════════════════════════════════════════
-    //  R26. computations (dispatch)
-    // ═════════════════════════════════════════════════════════════════
 
     @Override
     public ASTNode visitComputation(ELSDParser.ComputationContext ctx) {
@@ -391,10 +352,6 @@ public class ASTBuilder extends ELSDParserBaseVisitor<ASTNode> {
         throw new RuntimeException("Unknown computation at line " + ctx.getStart().getLine());
     }
 
-    // ═════════════════════════════════════════════════════════════════
-    //  R27. find
-    // ═════════════════════════════════════════════════════════════════
-
     @Override
     public ASTNode visitFindExpr(ELSDParser.FindExprContext ctx) {
         FindExpr node = new FindExpr();
@@ -404,10 +361,6 @@ public class ASTBuilder extends ELSDParserBaseVisitor<ASTNode> {
         node.generation = extractGenTag(ctx.genTag());
         return node;
     }
-
-    // ═════════════════════════════════════════════════════════════════
-    //  R28. cross
-    // ═════════════════════════════════════════════════════════════════
 
     @Override
     public ASTNode visitCrossExpr(ELSDParser.CrossExprContext ctx) {
@@ -422,10 +375,6 @@ public class ASTBuilder extends ELSDParserBaseVisitor<ASTNode> {
         return node;
     }
 
-    // ═════════════════════════════════════════════════════════════════
-    //  R29. pred
-    // ═════════════════════════════════════════════════════════════════
-
     @Override
     public ASTNode visitPredExpr(ELSDParser.PredExprContext ctx) {
         PredExpr node = new PredExpr();
@@ -434,10 +383,6 @@ public class ASTBuilder extends ELSDParserBaseVisitor<ASTNode> {
         node.generation = extractGenTag(ctx.genTag());
         return node;
     }
-
-    // ═════════════════════════════════════════════════════════════════
-    //  R30. estimate
-    // ═════════════════════════════════════════════════════════════════
 
     @Override
     public ASTNode visitEstExpr(ELSDParser.EstExprContext ctx) {
@@ -450,10 +395,6 @@ public class ASTBuilder extends ELSDParserBaseVisitor<ASTNode> {
         }
         return node;
     }
-
-    // ═════════════════════════════════════════════════════════════════
-    //  R31. infer
-    // ═════════════════════════════════════════════════════════════════
 
     @Override
     public ASTNode visitInferParents(ELSDParser.InferParentsContext ctx) {
@@ -475,10 +416,6 @@ public class ASTBuilder extends ELSDParserBaseVisitor<ASTNode> {
         node.additionalIds = ctx.idList() != null ? extractIdList(ctx.idList()) : new ArrayList<>();
         return node;
     }
-
-    // ═════════════════════════════════════════════════════════════════
-    //  R32. probability
-    // ═════════════════════════════════════════════════════════════════
 
     @Override
     public ASTNode visitProbSimple(ELSDParser.ProbSimpleContext ctx) {
@@ -518,10 +455,6 @@ public class ASTBuilder extends ELSDParserBaseVisitor<ASTNode> {
         return node;
     }
 
-    // ═════════════════════════════════════════════════════════════════
-    //  R33. linkage
-    // ═════════════════════════════════════════════════════════════════
-
     @Override
     public ASTNode visitLinkPair(ELSDParser.LinkPairContext ctx) {
         LinkExpr node = new LinkExpr();
@@ -543,10 +476,6 @@ public class ASTBuilder extends ELSDParserBaseVisitor<ASTNode> {
         return node;
     }
 
-    // ═════════════════════════════════════════════════════════════════
-    //  R34. sex-linked
-    // ═════════════════════════════════════════════════════════════════
-
     @Override
     public ASTNode visitSexSimple(ELSDParser.SexSimpleContext ctx) {
         SexExpr node = new SexExpr();
@@ -564,10 +493,6 @@ public class ASTBuilder extends ELSDParserBaseVisitor<ASTNode> {
         node.value = (Expression) visit(ctx.expression());
         return node;
     }
-
-    // ═════════════════════════════════════════════════════════════════
-    //  R35. blood group
-    // ═════════════════════════════════════════════════════════════════
 
     @Override
     public ASTNode visitBloodSingle(ELSDParser.BloodSingleContext ctx) {
@@ -590,11 +515,8 @@ public class ASTBuilder extends ELSDParserBaseVisitor<ASTNode> {
         return node;
     }
 
-    // ═════════════════════════════════════════════════════════════════
-    //  R36. events (called via buildEvent helper, but also handle
-    //       direct visits for event used as expression)
-    // ═════════════════════════════════════════════════════════════════
-
+    // event nodes are normally built via buildEvent(); these overrides handle
+    // cases where an event appears directly as an expression in the parse tree
     @Override
     public ASTNode visitEventPhenotype(ELSDParser.EventPhenotypeContext ctx) {
         return buildEvent(ctx);
@@ -609,10 +531,6 @@ public class ASTBuilder extends ELSDParserBaseVisitor<ASTNode> {
     public ASTNode visitEventCarries(ELSDParser.EventCarriesContext ctx) {
         return buildEvent(ctx);
     }
-
-    // ═════════════════════════════════════════════════════════════════
-    //  R44. I/O
-    // ═════════════════════════════════════════════════════════════════
 
     @Override
     public ASTNode visitPrintId(ELSDParser.PrintIdContext ctx) {

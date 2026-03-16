@@ -8,10 +8,8 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import java.awt.Dimension;
 import java.awt.Font;
 
-// graphical viewer for the AST using a Swing JTree
 public class ASTTreeViewer {
 
-    // opens a window showing the AST as a tree
     public static void show(ASTNode root) {
         DefaultMutableTreeNode treeRoot = buildSwingTree(root);
 
@@ -19,12 +17,11 @@ public class ASTTreeViewer {
         jTree.setFont(new Font("Monospaced", Font.PLAIN, 14));
         jTree.setRowHeight(22);
 
-        // expand all rows so the full tree is visible
+        // pre-expand all rows; getRowCount() grows as rows expand, so iterate forward
         for (int i = 0; i < jTree.getRowCount(); i++) {
             jTree.expandRow(i);
         }
 
-        // custom colors for different node types
         DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
         renderer.setLeafIcon(null);
         renderer.setOpenIcon(null);
@@ -42,7 +39,6 @@ public class ASTTreeViewer {
         frame.setVisible(true);
     }
 
-    // recursively converts AST nodes into JTree nodes
     private static DefaultMutableTreeNode buildSwingTree(ASTNode node) {
         if (node == null) return new DefaultMutableTreeNode("null");
 
@@ -326,7 +322,6 @@ public class ASTTreeViewer {
         return new DefaultMutableTreeNode(node.getClass().getSimpleName());
     }
 
-    // helper to wrap a child under a labeled parent node
     private static DefaultMutableTreeNode labeled(String label, DefaultMutableTreeNode child) {
         DefaultMutableTreeNode n = new DefaultMutableTreeNode(label);
         n.add(child);

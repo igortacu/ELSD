@@ -3,27 +3,23 @@ package elsd.ast;
 import java.util.List;
 import java.util.ArrayList;
 
-// base class for all AST nodes
 public abstract class ASTNode {
 
-    // source location for error messages
     public int line;
     public int col;
 
-    // visitor pattern accept method
     public abstract <T> T accept(ASTVisitor<T> visitor);
 
-    // top level
+    // --- top level ---
 
-    // root node, holds all statements
     public static class Program extends ASTNode {
         public final List<ASTNode> statements = new ArrayList<>();
         @Override public <T> T accept(ASTVisitor<T> v) { return v.visitProgram(this); }
     }
 
-    // declarations
+    // --- declarations ---
 
-    // variable declaration like: gene myGene = value
+    // gene myGene = value
     public static class Declaration extends ASTNode {
         public String type;
         public List<String> ids;
@@ -31,9 +27,9 @@ public abstract class ASTNode {
         @Override public <T> T accept(ASTVisitor<T> v) { return v.visitDeclaration(this); }
     }
 
-    // assignments
+    // --- assignments ---
 
-    // simple assignment: field id = expr
+    // field id = expr
     public static class AssignExpr extends ASTNode {
         public String field;
         public String id;
@@ -41,7 +37,7 @@ public abstract class ASTNode {
         @Override public <T> T accept(ASTVisitor<T> v) { return v.visitAssignExpr(this); }
     }
 
-    // multi assignment: field id1 id2 = expr1 expr2
+    // field id1 id2 = expr1 expr2
     public static class AssignMulti extends ASTNode {
         public String field;
         public List<String> ids;
@@ -49,50 +45,43 @@ public abstract class ASTNode {
         @Override public <T> T accept(ASTVisitor<T> v) { return v.visitAssignMulti(this); }
     }
 
-    // dominance assignment: A dominant over a
+    // A dominant over a
     public static class AssignDominance extends ASTNode {
         public String dominant;
         public String recessive;
         @Override public <T> T accept(ASTVisitor<T> v) { return v.visitAssignDominance(this); }
     }
 
-    // expressions
+    // --- expressions ---
 
-    // base class for all expressions
     public static abstract class Expression extends ASTNode {}
 
-    // number like 42 or 3.14
     public static class NumberLiteral extends Expression {
         public String value;
         @Override public <T> T accept(ASTVisitor<T> v) { return v.visitNumberLiteral(this); }
     }
 
-    // string like "hello"
     public static class StringLiteral extends Expression {
         public String value;
         @Override public <T> T accept(ASTVisitor<T> v) { return v.visitStringLiteral(this); }
     }
 
-    // true or false
     public static class BooleanLiteral extends Expression {
         public boolean value;
         @Override public <T> T accept(ASTVisitor<T> v) { return v.visitBooleanLiteral(this); }
     }
 
-    // variable reference
     public static class Identifier extends Expression {
         public String name;
         @Override public <T> T accept(ASTVisitor<T> v) { return v.visitIdentifier(this); }
     }
 
-    // unary op like -x or not x
     public static class UnaryExpr extends Expression {
         public String op;
         public Expression operand;
         @Override public <T> T accept(ASTVisitor<T> v) { return v.visitUnaryExpr(this); }
     }
 
-    // binary op like x + y or x * y
     public static class BinaryExpr extends Expression {
         public String op;
         public Expression left;
@@ -100,18 +89,15 @@ public abstract class ASTNode {
         @Override public <T> T accept(ASTVisitor<T> v) { return v.visitBinaryExpr(this); }
     }
 
-    // event used as expression
     public static class EventExpr extends Expression {
         public Event event;
         @Override public <T> T accept(ASTVisitor<T> v) { return v.visitEventExpr(this); }
     }
 
-    // conditions
+    // --- conditions ---
 
-    // base class for conditions
     public static abstract class Condition extends ASTNode {}
 
-    // comparison like x > 5
     public static class CompareCondition extends Condition {
         public Expression left;
         public String op;
@@ -119,7 +105,6 @@ public abstract class ASTNode {
         @Override public <T> T accept(ASTVisitor<T> v) { return v.visitCompareCondition(this); }
     }
 
-    // logical and/or
     public static class LogicalCondition extends Condition {
         public String op;
         public Condition left;
@@ -127,28 +112,25 @@ public abstract class ASTNode {
         @Override public <T> T accept(ASTVisitor<T> v) { return v.visitLogicalCondition(this); }
     }
 
-    // not condition
     public static class NotCondition extends Condition {
         public Condition operand;
         @Override public <T> T accept(ASTVisitor<T> v) { return v.visitNotCondition(this); }
     }
 
-    // flow structures
+    // --- flow structures ---
 
-    // if / elif / else
+    // if / elif / else chain; branches[0] is always the "if"
     public static class IfStatement extends ASTNode {
         public final List<ConditionBlock> branches = new ArrayList<>();
         public List<ASTNode> elseBody;
         @Override public <T> T accept(ASTVisitor<T> v) { return v.visitIfStatement(this); }
     }
 
-    // one branch in an if/elif chain
     public static class ConditionBlock {
         public Condition condition;
         public List<ASTNode> body;
     }
 
-    // ternary: condition ? stmt1 : stmt2
     public static class TernaryStatement extends ASTNode {
         public Condition condition;
         public ASTNode thenBranch;
@@ -156,14 +138,12 @@ public abstract class ASTNode {
         @Override public <T> T accept(ASTVisitor<T> v) { return v.visitTernaryStatement(this); }
     }
 
-    // while loop
     public static class WhileStatement extends ASTNode {
         public Condition condition;
         public List<ASTNode> body;
         @Override public <T> T accept(ASTVisitor<T> v) { return v.visitWhileStatement(this); }
     }
 
-    // for loop
     public static class ForStatement extends ASTNode {
         public String variable;
         public List<Expression> iterable;
@@ -171,9 +151,9 @@ public abstract class ASTNode {
         @Override public <T> T accept(ASTVisitor<T> v) { return v.visitForStatement(this); }
     }
 
-    // computations
+    // --- computations ---
 
-    // find field of gene in generation
+    // looks up a named field on a gene, optionally scoped to a specific generation
     public static class FindExpr extends ASTNode {
         public String field;
         public String id;
@@ -181,7 +161,7 @@ public abstract class ASTNode {
         @Override public <T> T accept(ASTVisitor<T> v) { return v.visitFindExpr(this); }
     }
 
-    // cross two parents to get offspring
+    // mendelian cross of two parents producing named offspring; ratios are optional
     public static class CrossExpr extends ASTNode {
         public String parent1;
         public String parent2;
@@ -190,14 +170,14 @@ public abstract class ASTNode {
         @Override public <T> T accept(ASTVisitor<T> v) { return v.visitCrossExpr(this); }
     }
 
-    // predict traits for genes
+    // predicts trait distribution across a generation
     public static class PredExpr extends ASTNode {
         public List<String> ids;
         public Integer generation;
         @Override public <T> T accept(ASTVisitor<T> v) { return v.visitPredExpr(this); }
     }
 
-    // estimate a value with optional confidence
+    // assigns a quantitative value to a trait with optional confidence interval
     public static class EstimateExpr extends ASTNode {
         public String id;
         public String value;
@@ -205,7 +185,7 @@ public abstract class ASTNode {
         @Override public <T> T accept(ASTVisitor<T> v) { return v.visitEstimateExpr(this); }
     }
 
-    // infer parents or field from data
+    // infers either parent genotypes or a specific field from observed data
     public static class InferExpr extends ASTNode {
         public boolean inferParents;
         public String field;
@@ -214,14 +194,14 @@ public abstract class ASTNode {
         @Override public <T> T accept(ASTVisitor<T> v) { return v.visitInferExpr(this); }
     }
 
-    // probability of events, optionally conditional
+    // probability of events; supports conditional form P(A | B, C)
     public static class ProbExpr extends ASTNode {
         public List<Event> events;
         public List<Event> givenEvents;
         @Override public <T> T accept(ASTVisitor<T> v) { return v.visitProbExpr(this); }
     }
 
-    // linkage between genes
+    // genetic linkage — tracks recombination frequency between loci
     public static class LinkExpr extends ASTNode {
         public List<String> ids;
         public String recombination;
@@ -229,7 +209,7 @@ public abstract class ASTNode {
         @Override public <T> T accept(ASTVisitor<T> v) { return v.visitLinkExpr(this); }
     }
 
-    // sex-linked trait
+    // sex-linked trait, optionally with a field assignment
     public static class SexExpr extends ASTNode {
         public String id;
         public String field;
@@ -237,7 +217,7 @@ public abstract class ASTNode {
         @Override public <T> T accept(ASTVisitor<T> v) { return v.visitSexExpr(this); }
     }
 
-    // blood group analysis
+    // ABO / Rh blood group analysis for one or more individuals
     public static class BloodExpr extends ASTNode {
         public List<String> ids;
         public String system;
@@ -245,9 +225,9 @@ public abstract class ASTNode {
         @Override public <T> T accept(ASTVisitor<T> v) { return v.visitBloodExpr(this); }
     }
 
-    // events
+    // --- events ---
 
-    // an event like phenotype(X) or carries(X, alleles)
+    // phenotype(X), genotype(X), or carries(X, alleles)
     public static class Event extends ASTNode {
         public String kind;
         public String id;
@@ -255,9 +235,8 @@ public abstract class ASTNode {
         @Override public <T> T accept(ASTVisitor<T> v) { return v.visitEvent(this); }
     }
 
-    // io
+    // --- I/O ---
 
-    // print statement
     public static class PrintStatement extends ASTNode {
         public String field;
         public String targetId;
