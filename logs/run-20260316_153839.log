@@ -1,0 +1,73 @@
+🔨 Compiling...
+   ✓ Compiled to build/
+🚀 Running ELSD parser...
+
+
+═══════════════════════════════════════════
+  ELSD Parse Result
+═══════════════════════════════════════════
+  File   : examples/simple.elsd
+  Tokens : 44
+  Errors : 0
+═══════════════════════════════════════════
+
+✓ Parse successful – no syntax errors.
+
+── Parse Tree (LISP) ──────────────────────
+
+  (program 
+    (statementList 
+      (statement 
+        (declaration 
+          (type gene) 
+          (idList A) ;)) 
+      (statement 
+        (declaration 
+          (type parent) 
+          (idList mom) ;)) 
+      (statement 
+        (declaration 
+          (type parent) 
+          (idList dad) ;)) 
+      (statement 
+        (assignment set 
+          (field genotype) A = 
+          (expression "Aa") ;)) 
+      (statement 
+        (computation 
+          (crossExpr cross mom x dad -> child ratio 
+            (exprList 
+              (expression 1) , 
+              (expression 1)) ;))) 
+      (statement 
+        (computation 
+          (findExpr find 
+            (field genotype) A ;))) 
+      (statement 
+        (computation 
+          (probExpr probability 
+            (event genotype 
+              ( A )) ;))) 
+      (statement 
+        (io print 
+          (field genotype) A ;)) 
+      (statement 
+        (io print 
+          (exprList 
+            (expression "done")) ;))) <EOF>)
+
+── Abstract Syntax Tree ───────────────────
+Program
+  Declaration [type=gene, ids=[A]]
+  Declaration [type=parent, ids=[mom]]
+  Declaration [type=parent, ids=[dad]]
+  Assign [id=A field=genotype]
+    = "Aa"
+  Cross [mom x dad -> child]
+    ratio: 1, 1
+  Find [field=genotype, id=A]
+  Probability
+    events: genotype(A)
+  Print A [field=genotype]
+  Print "done"
+

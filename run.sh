@@ -15,6 +15,23 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$SCRIPT_DIR"
 
+# --- Logging: create logs dir and tee all output to a timestamped file ---
+# If ELSD_LOGFILE env var is set it will be used as the logfile path.
+# By default capture stdout/stderr to both console and a logfile in logs/
+LOG_DIR="logs"
+mkdir -p "$LOG_DIR"
+if [ -n "$ELSD_LOGFILE" ]; then
+    LOGFILE="$ELSD_LOGFILE"
+    mkdir -p "$(dirname "$LOGFILE")"
+else
+    TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
+    LOGFILE="$LOG_DIR/run-$TIMESTAMP.log"
+fi
+
+echo "Logging to $LOGFILE"
+# Redirect all following stdout/stderr through tee (append mode)
+exec > >(tee -a "$LOGFILE") 2>&1
+
 ANTLR_JAR="antlr-4.13.2-complete.jar"
 SRC_DIR="src/main/java"
 GEN_DIR="$SRC_DIR/elsd/generated"

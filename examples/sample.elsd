@@ -1,7 +1,7 @@
 // Sample ELSD genetics program
 // Demonstrates key features of the DSL
 
-// ── Declarations ──
+// ─ Declarations
 gene eyeColor;
 gene hairColor;
 genes traitA, traitB;

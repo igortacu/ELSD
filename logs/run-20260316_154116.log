@@ -1,0 +1,236 @@
+🔨 Compiling...
+   ✓ Compiled to build/
+🚀 Running ELSD parser...
+
+
+═══════════════════════════════════════════
+  ELSD Parse Result
+═══════════════════════════════════════════
+  File   : examples/sample.elsd
+  Tokens : 223
+  Errors : 0
+═══════════════════════════════════════════
+
+✓ Parse successful – no syntax errors.
+
+── Parse Tree (LISP) ──────────────────────
+
+  (program 
+    (statementList 
+      (statement 
+        (declaration 
+          (type gene) 
+          (idList eyeColor) ;)) 
+      (statement 
+        (declaration 
+          (type gene) 
+          (idList hairColor) ;)) 
+      (statement 
+        (declaration 
+          (type genes) 
+          (idList traitA , traitB) ;)) 
+      (statement 
+        (declaration 
+          (type parent) 
+          (idList mother) ;)) 
+      (statement 
+        (declaration 
+          (type parent) 
+          (idList father) ;)) 
+      (statement 
+        (declaration 
+          (type number) 
+          (idList ratio1) = 
+          (expression 3) ;)) 
+      (statement 
+        (declaration 
+          (type boolean) 
+          (idList isDominant) = 
+          (expression true) ;)) 
+      (statement 
+        (declaration 
+          (type string) 
+          (idList label1) = 
+          (expression "Experiment 1") ;)) 
+      (statement 
+        (assignment set dom : B -> b ;)) 
+      (statement 
+        (assignment set dom : A -> a ;)) 
+      (statement 
+        (assignment set 
+          (field phenotype) eyeColor = 
+          (expression "brown") ;)) 
+      (statement 
+        (assignment set 
+          (field genotype) eyeColor = 
+          (expression "Bb") ;)) 
+      (statement 
+        (computation 
+          (crossExpr cross mother x father -> offspring ratio 
+            (exprList 
+              (expression 3) , 
+              (expression 1)) ;))) 
+      (statement 
+        (computation 
+          (findExpr find 
+            (field genotype) eyeColor ;))) 
+      (statement 
+        (computation 
+          (findExpr find 
+            (field phenotype) traitA 
+            (genTag generation 2) ;))) 
+      (statement 
+        (computation 
+          (predExpr pred 
+            (idList traitA , traitB) 
+            (genTag generation 3) ;))) 
+      (statement 
+        (computation 
+          (estExpr estimate traitA 0.75 confidence 0.95 ;))) 
+      (statement 
+        (computation 
+          (inferExpr infer parents from offspring ;))) 
+      (statement 
+        (computation 
+          (inferExpr infer 
+            (field genotype) from eyeColor , 
+            (idList hairColor) ;))) 
+      (statement 
+        (computation 
+          (probExpr probability 
+            (event phenotype 
+              ( eyeColor )) ;))) 
+      (statement 
+        (computation 
+          (probExpr probability 
+            (event genotype 
+              ( traitA )) given 
+            (event phenotype 
+              ( traitA )) ;))) 
+      (statement 
+        (computation 
+          (linkExpr linkage traitA , traitB recombination 0.15 ;))) 
+      (statement 
+        (computation 
+          (linkExpr linkage 
+            (idList traitA , traitB) recombination 0.15 distance 20 ;))) 
+      (statement 
+        (computation 
+          (sexExpr sexlinked eyeColor ;))) 
+      (statement 
+        (computation 
+          (sexExpr sexlinked eyeColor 
+            (field phenotype) 
+            (expression "red") ;))) 
+      (statement 
+        (computation 
+          (bloodExpr bloodgroup patient1 system 
+            (bloodsys ABO) ;))) 
+      (statement 
+        (computation 
+          (bloodExpr bloodgroup 
+            (idList patient1 , patient2) system 
+            (bloodsys Rh) phenotype 
+            (exprList 
+              (expression "positive") , 
+              (expression "negative")) ;))) 
+      (statement 
+        (flowStructure if 
+          (condition 
+            (expression ratio1) 
+            (operator >) 
+            (expression 2)) then 
+          (statementList 
+            (statement 
+              (io print eyeColor ;))) elif 
+          (condition 
+            (expression ratio1) 
+            (operator ==) 
+            (expression 2)) then 
+          (statementList 
+            (statement 
+              (io print hairColor ;))) else 
+          (statementList 
+            (statement 
+              (io print traitA ;))) end ;)) 
+      (statement 
+        (flowStructure for idx in 
+          (exprList 
+            (expression 1) , 
+            (expression 2) , 
+            (expression 3)) do 
+          (statementList 
+            (statement 
+              (io print idx ;))) end ;)) 
+      (statement 
+        (io print eyeColor ;)) 
+      (statement 
+        (io print 
+          (field genotype) eyeColor ;)) 
+      (statement 
+        (io print 
+          (exprList 
+            (expression 
+              (expression 1) + 
+              (expression 
+                (expression 2) * 
+                (expression 3)))) ;)) 
+      (statement 
+        (io print 
+          (exprList 
+            (expression 
+              (event phenotype 
+                ( traitA ))) , 
+            (expression 
+              (event genotype 
+                ( traitB )))) ;))) <EOF>)
+
+── Abstract Syntax Tree ───────────────────
+Program
+  Declaration [type=gene, ids=[eyeColor]]
+  Declaration [type=gene, ids=[hairColor]]
+  Declaration [type=genes, ids=[traitA, traitB]]
+  Declaration [type=parent, ids=[mother]]
+  Declaration [type=parent, ids=[father]]
+  Declaration [type=number, ids=[ratio1] = 3]
+  Declaration [type=boolean, ids=[isDominant] = true]
+  Declaration [type=string, ids=[label1] = "Experiment 1"]
+  Dominance [B -> b]
+  Dominance [A -> a]
+  Assign [id=eyeColor field=phenotype]
+    = "brown"
+  Assign [id=eyeColor field=genotype]
+    = "Bb"
+  Cross [mother x father -> offspring]
+    ratio: 3, 1
+  Find [field=genotype, id=eyeColor]
+  Find [field=phenotype, id=traitA gen=2]
+  Pred [ids=[traitA, traitB] gen=3]
+  Estimate [id=traitA, value=0.75 confidence=0.95]
+  Infer parents from offspring
+  Infer [field=genotype] from eyeColor, [hairColor]
+  Probability
+    events: phenotype(eyeColor)
+  Probability
+    events: genotype(traitA)
+    given:  phenotype(traitA)
+  Linkage [ids=[traitA, traitB], recomb=0.15]
+  Linkage [ids=[traitA, traitB], recomb=0.15 distance=20]
+  SexLinked [id=eyeColor]
+  SexLinked [id=eyeColor, field=phenotype, value="red"]
+  BloodGroup [ids=[patient1], system=ABO]
+  BloodGroup [ids=[patient1, patient2], system=Rh]
+    phenotypes: "positive", "negative"
+  If (ratio1 > 2)
+    Print eyeColor
+  Elif (ratio1 == 2)
+    Print hairColor
+  Else
+    Print traitA
+  For idx in [1, 2, 3]
+    Print idx
+  Print eyeColor
+  Print eyeColor [field=genotype]
+  Print (1 + (2 * 3))
+  Print Event [phenotype(traitA)], Event [genotype(traitB)]
+

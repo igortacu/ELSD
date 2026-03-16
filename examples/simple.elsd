@@ -1,0 +1,19 @@
+// Simple ELSD program - minimal variant
+// Very small and easy to read
+
+// Declarations
+gene A;
+parent mom;
+parent dad;
+
+// Set a simple genotype
+set genotype A = "Aa";
+
+// Perform a basic cross and give a balanced ratio
+cross mom x dad -> child ratio 1, 1;
+
+// Queries and output
+find genotype A;
+probability genotype(A);
+print genotype A;
+print "done";
