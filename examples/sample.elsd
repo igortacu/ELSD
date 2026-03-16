@@ -11,48 +11,48 @@ number ratio1 = 3;
 boolean isDominant = true;
 string label1 = "Experiment 1";
 
-// ── Dominance assignment ──
+// Dominance assignment
 set dom : B -> b;
 set dom : A -> a;
 
-// ── Field assignments ──
+// Field assignments
 set phenotype eyeColor = "brown";
 set genotype eyeColor = "Bb";
 
-// ── Cross expression ──
+// Cross expression
 cross mother x father -> offspring ratio 3, 1;
 
-// ── Find expression ──
+// Find expression
 find genotype eyeColor;
 find phenotype traitA generation 2;
 
-// ── Prediction ──
+// Prediction
 pred traitA, traitB generation 3;
 
-// ── Estimation ──
+// Estimation
 estimate traitA 0.75 confidence 0.95;
 
-// ── Inference ──
+// Inference
 infer parents from offspring;
 infer genotype from eyeColor, hairColor;
 
-// ── Probability ──
+// Probability
 probability phenotype(eyeColor);
 probability genotype(traitA) given phenotype(traitA);
 
-// ── Linkage ──
+// Linkage
 linkage traitA, traitB recombination 0.15;
 linkage traitA, traitB recombination 0.15 distance 20;
 
-// ── Sex-linked ──
+// Sex-linked
 sexlinked eyeColor;
 sexlinked eyeColor phenotype "red";
 
-// ── Blood group ──
+// Blood group
 bloodgroup patient1 system ABO;
 bloodgroup patient1, patient2 system Rh phenotype "positive", "negative";
 
-// ── Flow control ──
+// Flow control
 if ratio1 > 2 then
     print eyeColor;
 elif ratio1 == 2 then
@@ -65,7 +65,7 @@ for idx in 1, 2, 3 do
     print idx;
 end;
 
-// ── I/O ──
+// I/O
 print eyeColor;
 print genotype eyeColor;
 print 1 + 2 * 3;
