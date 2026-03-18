@@ -83,29 +83,27 @@ public class Main {
 
             int errorCount = parser.getNumberOfSyntaxErrors();
             System.out.println();
-            System.out.println("═══════════════════════════════════════════");
+
             System.out.println("  ELSD Parse Result");
-            System.out.println("═══════════════════════════════════════════");
             System.out.println("  File   : " + filePath);
             System.out.println("  Tokens : " + tokens.getTokens().size());
             System.out.println("  Errors : " + errorCount);
-            System.out.println("═══════════════════════════════════════════");
             System.out.println();
 
             if (errorCount == 0) {
-                System.out.println("✓ Parse successful – no syntax errors.");
+                System.out.println("Parse successful – no syntax errors.");
             } else {
-                System.out.println("✗ Parse completed with " + errorCount + " syntax error(s).");
+                System.out.println("Parse completed with " + errorCount + " syntax error(s).");
             }
 
             System.out.println();
-            System.out.println("── Parse Tree (LISP) ──────────────────────");
+            System.out.println("── Parse Tree (LISP)");
             String lispTree = tree.toStringTree(parser);
             System.out.println(prettyPrintTree(lispTree));
 
             if (showAst) {
                 System.out.println();
-                System.out.println("── Abstract Syntax Tree ───────────────────");
+                System.out.println("── Abstract Syntax Tree");
                 ASTBuilder builder = new ASTBuilder();
                 ASTNode.Program ast = (ASTNode.Program) builder.visit(tree);
                 ASTPrinter printer = new ASTPrinter();
@@ -158,7 +156,7 @@ public class Main {
 
     private static void printTokens(CommonTokenStream tokens, ELSDLexer lexer) {
         System.out.println();
-        System.out.println("── Token Stream ───────────────────────────");
+        System.out.println("── Token Stream");
         System.out.printf("%-6s %-20s %-25s %s%n", "INDEX", "TOKEN TYPE", "TEXT", "LINE:COL");
         System.out.println("─".repeat(80));
 

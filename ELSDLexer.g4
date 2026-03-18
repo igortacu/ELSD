@@ -1,6 +1,5 @@
 lexer grammar ELSDLexer;
 
-// ── Keywords: Types ──────────────────────────────────────────────────
 GENE        : 'gene' ;
 GENES       : 'genes' ;
 PARENT      : 'parent' ;
@@ -9,7 +8,6 @@ BOOLEAN     : 'boolean' ;
 STRING_TYPE : 'string' ;
 NUMBER_TYPE : 'number' ;
 
-// ── Keywords: Flow Control ───────────────────────────────────────────
 IF          : 'if' ;
 THEN        : 'then' ;
 ELSE        : 'else' ;
@@ -20,14 +18,14 @@ FOR         : 'for' ;
 IN          : 'in' ;
 END         : 'end' ;
 
-// ── Keywords: Logic ──────────────────────────────────────────────────
+// Keywords: Logic
 AND         : 'and' ;
 OR          : 'or' ;
 NOT         : 'not' ;
 TRUE        : 'true' ;
 FALSE       : 'false' ;
 
-// ── Keywords: Assignment / Fields ────────────────────────────────────
+// Keywords: Assignment / Fields
 SET         : 'set' ;
 DOM         : 'dom' ;
 LABEL       : 'label' ;
@@ -40,8 +38,9 @@ SEXLINKED   : 'sexlinked' ;
 AUTOSOMAL   : 'autosomal' ;
 RATIO       : 'ratio' ;
 
-// ── Keywords: Computations ───────────────────────────────────────────
+CROSS       : 'cross' ;
 FIND        : 'find' ;
+PRED        : 'pred' ;
 CROSS       : 'cross' ;
 PRED        : 'pred' ;
 ESTIMATE    : 'estimate' ;
@@ -60,11 +59,9 @@ BLOODGROUP  : 'bloodgroup' ;
 SYSTEM      : 'system' ;
 CARRIES     : 'carries' ;
 
-// ── Keywords: Blood Systems ──────────────────────────────────────────
 ABO         : 'ABO' ;
 RH          : 'Rh' ;
 
-// ── Operators ────────────────────────────────────────────────────────
 PLUS        : '+' ;
 MINUS       : '-' ;
 STAR        : '*' ;
@@ -83,7 +80,6 @@ NEQ         : '!=' ;
 QUESTION    : '?' ;
 COLON       : ':' ;
 
-// ── Delimiters ───────────────────────────────────────────────────────
 SEMI        : ';' ;
 COMMA       : ',' ;
 DOT         : '.' ;
@@ -92,7 +88,6 @@ RPAREN      : ')' ;
 LBRACK      : '[' ;
 RBRACK      : ']' ;
 
-// ── Literals ─────────────────────────────────────────────────────────
 NUMBER
     : '-'? DIGIT+ ('.' DIGIT+)?
     ;
@@ -101,12 +96,10 @@ STRING_LITERAL
     : '"' (~["\r\n])* '"'
     ;
 
-// ── Identifiers ──────────────────────────────────────────────────────
 ID
     : LETTER (LETTER | DIGIT | '_')*
     ;
 
-// ── Comments (skip) ──────────────────────────────────────────────────
 LINE_COMMENT
     : '//' ~[\r\n]* -> skip
     ;
@@ -115,11 +108,9 @@ BLOCK_COMMENT
     : '/*' .*? '*/' -> skip
     ;
 
-// ── Whitespace (skip) ───────────────────────────────────────────────
 WS
     : [ \t\r\n]+ -> skip
     ;
 
-// ── Fragments ────────────────────────────────────────────────────────
 fragment LETTER : [a-zA-Z] ;
 fragment DIGIT  : [0-9] ;

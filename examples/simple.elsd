@@ -1,6 +1,3 @@
-// Simple ELSD program - minimal variant
-// Very small and easy to read
-
 // Declarations
 gene A;
 parent mom;

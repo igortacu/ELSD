@@ -1,14 +1,10 @@
 #!/bin/bash
-# ──────────────────────────────────────────────────────────────────────
-# ELSD – Build & Run Script
-# ──────────────────────────────────────────────────────────────────────
 # Usage:
 #   ./run.sh examples/sample.elsd            # parse a file
 #   ./run.sh --tokens examples/sample.elsd   # also show token stream
 #   ./run.sh --ast examples/sample.elsd      # build & print the AST
 #   ./run.sh --gui examples/sample.elsd      # open parse-tree GUI
 #   ./run.sh --generate                      # regenerate ANTLR sources
-# ──────────────────────────────────────────────────────────────────────
 
 set -e
 
@@ -37,13 +33,13 @@ SRC_DIR="src/main/java"
 GEN_DIR="$SRC_DIR/elsd/generated"
 OUT_DIR="build"
 
-# ── Download ANTLR jar if missing ─────────────────────────────────────
+# ── Download ANTLR jar if missing
 if [ ! -f "$ANTLR_JAR" ]; then
     echo "⬇  Downloading ANTLR 4.13.2..."
     curl -O "https://www.antlr.org/download/$ANTLR_JAR"
 fi
 
-# ── Regenerate ANTLR sources ─────────────────────────────────────────
+# ── Regenerate ANTLR sources
 generate() {
     echo "🔧 Generating lexer/parser from .g4 grammars..."
     rm -rf "$GEN_DIR"
@@ -61,25 +57,25 @@ generate() {
     echo "   ✓ Generated in $GEN_DIR"
 }
 
-# ── Handle --generate flag ───────────────────────────────────────────
+# ── Handle --generate flag
 if [ "$1" == "--generate" ]; then
     generate
     exit 0
 fi
 
-# ── Regenerate if generated sources are missing ──────────────────────
+# ── Regenerate if generated sources are missing
 if [ ! -f "$GEN_DIR/ELSDLexer.java" ] || [ ! -f "$GEN_DIR/ELSDParser.java" ]; then
     generate
 fi
 
-# ── Compile ──────────────────────────────────────────────────────────
+# ── Compile
 echo "🔨 Compiling..."
 mkdir -p "$OUT_DIR"
 find "$SRC_DIR" -name "*.java" > /tmp/elsd_sources.txt
 javac -cp "$ANTLR_JAR" -d "$OUT_DIR" @/tmp/elsd_sources.txt
 echo "   ✓ Compiled to $OUT_DIR/"
 
-# ── Run ──────────────────────────────────────────────────────────────
+# ── Run
 if [ $# -eq 0 ]; then
     echo ""
     echo "Usage: ./run.sh [--tokens] [--gui] <file.elsd>"

@@ -1,0 +1,106 @@
+🔨 Compiling...
+   ✓ Compiled to build/
+🚀 Running ELSD parser...
+
+
+── Token Stream ───────────────────────────
+INDEX  TOKEN TYPE           TEXT                      LINE:COL
+────────────────────────────────────────────────────────────────────────────────
+0      GENE                 'gene'                    2:0
+1      ID                   'A'                       2:5
+2      SEMI                 ';'                       2:6
+3      PARENT               'parent'                  3:0
+4      ID                   'mom'                     3:7
+5      SEMI                 ';'                       3:10
+6      PARENT               'parent'                  4:0
+7      ID                   'dad'                     4:7
+8      SEMI                 ';'                       4:10
+9      SET                  'set'                     7:0
+10     GENOTYPE             'genotype'                7:4
+11     ID                   'A'                       7:13
+12     ASSIGN               '='                       7:15
+13     STRING_LITERAL       '"Aa"'                    7:17
+14     SEMI                 ';'                       7:21
+15     CROSS                'cross'                   10:0
+16     ID                   'mom'                     10:6
+17     CROSS_OP             'x'                       10:10
+18     ID                   'dad'                     10:12
+19     ARROW                '->'                      10:16
+20     ID                   'child'                   10:19
+21     RATIO                'ratio'                   10:25
+22     NUMBER               '1'                       10:31
+23     COMMA                ','                       10:32
+24     NUMBER               '1'                       10:34
+25     SEMI                 ';'                       10:35
+26     FIND                 'find'                    13:0
+27     GENOTYPE             'genotype'                13:5
+28     ID                   'A'                       13:14
+29     SEMI                 ';'                       13:15
+30     PROBABILITY          'probability'             14:0
+31     GENOTYPE             'genotype'                14:12
+32     LPAREN               '('                       14:20
+33     ID                   'A'                       14:21
+34     RPAREN               ')'                       14:22
+35     SEMI                 ';'                       14:23
+36     PRINT                'print'                   15:0
+37     GENOTYPE             'genotype'                15:6
+38     ID                   'A'                       15:15
+39     SEMI                 ';'                       15:16
+40     PRINT                'print'                   16:0
+41     STRING_LITERAL       '"done"'                  16:6
+42     SEMI                 ';'                       16:12
+43     EOF                  <EOF>                     17:0
+
+
+═══════════════════════════════════════════
+  ELSD Parse Result
+═══════════════════════════════════════════
+  File   : examples/simple.elsd
+  Tokens : 44
+  Errors : 0
+═══════════════════════════════════════════
+
+✓ Parse successful – no syntax errors.
+
+── Parse Tree (LISP) ──────────────────────
+
+  (program 
+    (statementList 
+      (statement 
+        (declaration 
+          (type gene) 
+          (idList A) ;)) 
+      (statement 
+        (declaration 
+          (type parent) 
+          (idList mom) ;)) 
+      (statement 
+        (declaration 
+          (type parent) 
+          (idList dad) ;)) 
+      (statement 
+        (assignment set 
+          (field genotype) A = 
+          (expression "Aa") ;)) 
+      (statement 
+        (computation 
+          (crossExpr cross mom x dad -> child ratio 
+            (exprList 
+              (expression 1) , 
+              (expression 1)) ;))) 
+      (statement 
+        (computation 
+          (findExpr find 
+            (field genotype) A ;))) 
+      (statement 
+        (computation 
+          (probExpr probability 
+            (event genotype 
+              ( A )) ;))) 
+      (statement 
+        (io print 
+          (field genotype) A ;)) 
+      (statement 
+        (io print 
+          (exprList 
+            (expression "done")) ;))) <EOF>)
