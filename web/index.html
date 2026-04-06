@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ELSD Online Compiler</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ── Header ─────────────────────────────────────────────────────────── -->
+  <header class="toolbar">
+    <span class="logo">ELSD Online Compiler</span>
+    <div class="toolbar-actions">
+      <button id="btn-run" class="btn btn-run" title="Run (Ctrl+Enter)">
+        &#9654; Run
+      </button>
+      <button id="btn-clear" class="btn btn-clear" title="Clear output">
+        Clear
+      </button>
+    </div>
+  </header>
+
+  <!-- ── Main panels ────────────────────────────────────────────────────── -->
+  <main class="panels">
+
+    <!-- Left: editor -->
+    <section class="panel panel-editor">
+      <div class="panel-label">Editor</div>
+      <div id="editor-container"></div>
+    </section>
+
+    <!-- Resize handle -->
+    <div class="resize-handle" id="resize-handle"></div>
+
+    <!-- Right: output -->
+    <section class="panel panel-output">
+      <div class="panel-label">
+        Output
+        <span id="status-badge" class="badge"></span>
+      </div>
+      <div id="output-panel">
+        <pre id="output-stdout" class="output-block"></pre>
+        <pre id="output-stderr" class="output-block output-error"></pre>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── Monaco loader ──────────────────────────────────────────────────── -->
+  <script>
+    var require = {
+      paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs' }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs/loader.js"></script>
+  <script src="app.js"></script>
+
+</body>
+</html>

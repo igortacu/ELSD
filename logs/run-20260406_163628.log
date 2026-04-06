@@ -1,0 +1,3 @@
+🔧 Generating lexer/parser from .g4 grammars...
+error(51): ELSDLexer.g4:44:0: rule CROSS redefinition; previous at line 41
+error(51): ELSDLexer.g4:45:0: rule PRED redefinition; previous at line 43

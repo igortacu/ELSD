@@ -1,0 +1,7 @@
+🔨 Compiling...
+src/main/java/elsd/Interpreter.java:19: error: cannot find symbol
+        for (ASTNode stmt : node.statements) {
+             ^
+  symbol:   class ASTNode
+  location: class Interpreter
+1 error

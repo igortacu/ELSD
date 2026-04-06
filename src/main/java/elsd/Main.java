@@ -33,11 +33,12 @@ public class Main {
             System.exit(1);
         }
 
-        boolean showTokens = false;
-        boolean showAst = false;
-        boolean showGraph = false;
-        boolean showAstGui = false;
-        boolean showGui = false;
+    boolean showTokens = false;
+    boolean showAst = false;
+    boolean showGraph = false;
+    boolean showAstGui = false;
+    boolean showGui = false;
+    boolean doRun = false;
         String filePath = null;
 
         for (String arg : args) {
@@ -47,6 +48,7 @@ public class Main {
                 case "--graph":   showGraph = true;    break;
                 case "--ast-gui": showAstGui = true;  break;
                 case "--gui":     showGui = true;     break;
+                case "--run":     doRun = true;       break;
                 default:          filePath = arg;     break;
             }
         }
@@ -108,6 +110,15 @@ public class Main {
                 ASTNode.Program ast = (ASTNode.Program) builder.visit(tree);
                 ASTPrinter printer = new ASTPrinter();
                 System.out.println(printer.print(ast));
+            }
+
+            if (doRun) {
+                System.out.println();
+                System.out.println("── Running program semantics");
+                ASTBuilder builder = new ASTBuilder();
+                ASTNode.Program ast = (ASTNode.Program) builder.visit(tree);
+                elsd.Interpreter interp = new elsd.Interpreter();
+                interp.visitProgram(ast);
             }
 
             if (showGraph) {

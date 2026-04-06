@@ -41,8 +41,6 @@ RATIO       : 'ratio' ;
 CROSS       : 'cross' ;
 FIND        : 'find' ;
 PRED        : 'pred' ;
-CROSS       : 'cross' ;
-PRED        : 'pred' ;
 ESTIMATE    : 'estimate' ;
 PRINT       : 'print' ;
 ALL         : 'all' ;
